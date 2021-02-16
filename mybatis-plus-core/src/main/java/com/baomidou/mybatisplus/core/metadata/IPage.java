@@ -77,7 +77,7 @@ public interface IPage<T> extends Serializable {
         if (current <= 1L) {
             return 0L;
         }
-        return (current - 1) * getSize();
+        return Math.max((current - 1) * getSize(), 0L);
     }
 
     /**
