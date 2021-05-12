@@ -246,10 +246,12 @@ public class Page<T> implements IPage<T> {
         return optimizeCountSql;
     }
 
+    @Deprecated
     public boolean isOptimizeCountSql() {
         return optimizeCountSql();
     }
 
+    @Deprecated
     @Override
     public boolean isSearchCount() {
         if (total < 0) {
@@ -272,5 +274,22 @@ public class Page<T> implements IPage<T> {
     public long getPages() {
         // 解决 github issues/3208
         return IPage.super.getPages();
+    }
+
+    /* --------------- 以下为静态构造方式 --------------- */
+    public static <T> Page<T> of(long current, long size) {
+        return of(current, size, 0);
+    }
+
+    public static <T> Page<T> of(long current, long size, long total) {
+        return of(current, size, total, true);
+    }
+
+    public static <T> Page<T> of(long current, long size, boolean isSearchCount) {
+        return of(current, size, 0, isSearchCount);
+    }
+
+    public static <T> Page<T> of(long current, long size, long total, boolean isSearchCount) {
+        return new Page(current, size, total, isSearchCount);
     }
 }
