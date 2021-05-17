@@ -18,7 +18,9 @@ package com.baomidou.mybatisplus.core.injector;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
@@ -32,6 +34,7 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -233,6 +236,22 @@ public abstract class AbstractMethod implements Constants {
             sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER), true);
             return newLine ? NEWLINE + sqlScript : sqlScript;
         }
+    }
+
+    protected String sqlOrderBy(TableInfo tableInfo) {
+        /* 不存在排序字段，直接返回空 */
+        List<TableFieldInfo> orderByFields = tableInfo.getOrderByFields();
+        if (CollectionUtils.isEmpty(orderByFields)) {
+            return StringPool.EMPTY;
+        }
+        orderByFields.sort(Comparator.comparingInt(TableFieldInfo::getOrderBySort));
+        StringBuilder sql = new StringBuilder();
+        sql.append(NEWLINE).append(" ORDER BY ");
+        sql.append(orderByFields.stream().map(tfi -> String.format("%s %s", tfi.getColumn(),
+            tfi.getOrderByType())).collect(joining(",")));
+        /* 当wrapper中传递了orderBy属性，@orderBy注解失效 */
+        return SqlScriptUtils.convertIf(sql.toString(), String.format("%s == null or %s == null or %s == null or %s.size() == 0",
+            WRAPPER, WRAPPER_EXPRESSION, WRAPPER_EXPRESSION_ORDER, WRAPPER_EXPRESSION_ORDER), true);
     }
 
     /**
