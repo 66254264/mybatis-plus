@@ -2,7 +2,7 @@ import java.time.LocalDateTime
 
 allprojects {
     group = 'com.baomidou'
-    version = "3.4.2"
+    version = "3.4.3"
 }
 
 ext {
@@ -17,7 +17,7 @@ ext {
         springVersion = '5.3.7',
         springBootVersion = '2.4.5',
         jsqlparserVersion = '4.0',
-        junitVersion = '5.7.1',
+        junitVersion = '5.7.2',
     ]
 
     lib = [
