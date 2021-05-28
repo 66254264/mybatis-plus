@@ -162,7 +162,7 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
         boolean addOrdered = false;
         String buildSql = boundSql.getSql();
         List<OrderItem> orders = page.orders();
-        if (!CollectionUtils.isEmpty(orders)) {
+        if (CollectionUtils.isNotEmpty(orders)) {
             addOrdered = true;
             buildSql = this.concatOrderBy(buildSql, orders);
         }
@@ -414,8 +414,9 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
         if (CollectionUtils.isEmpty(orderByElements)) {
             return additionalOrderBy;
         }
-        orderByElements.addAll(additionalOrderBy);
-        return orderByElements;
+        // github pull/3550 优化排序，比如：默认 order by id 前端传了name排序，设置为 order by name,id
+        additionalOrderBy.addAll(orderByElements);
+        return additionalOrderBy;
     }
 
     /**
